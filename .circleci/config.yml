@@ -53,7 +53,7 @@ jobs:
           name: Build and push Docker image
           environment:
             NUM: << pipeline.number >>
-            TAG: << pipeline.git.tag>>
+            TAG: << pipeline.git.tag >>
           command: |
             docker build -t $DOCKER_TAG:latest .
             docker tag $DOCKER_TAG:latest -t $DOCKER_TAG:$NUM-$TAG
