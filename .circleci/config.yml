@@ -32,6 +32,9 @@ jobs:
             gotestsum --junitfile /tmp/test-reports/unit-tests.xml
       - store_test_results:
           path: /tmp/test-reports
+      - run:
+          name: build binary to bin
+          command: make build
       - persist_to_workspace:
           root: .
           paths:
