@@ -34,15 +34,24 @@ jobs:
           path: /tmp/test-reports
   
   deploy:
-    working_directory: ~/repo
     docker:
-      - image: circleci/golang:1.17
+      - image: cimg/go:1.18.3
     steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
-          name: test deployment
+          name: Build and push Docker image
+          environment:
+            NUM: << pipeline.number >>
+            TAG: << pipeline.git.tag>>
           command: |
-            echo "testing 123"
+            docker build -t $DOCKER_TAG:latest .
+            docker tag $DOCKER_TAG:latest -t $DOCKER_TAG:$NUM-$TAG
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push $DOCKER_TAG:latest
+            docker push $DOCKER_TAG:$NUM-$TAG
+
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
