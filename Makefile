@@ -6,3 +6,6 @@ build-image: build
 
 test-image: build-image
 	docker run -it deleema1/circle-ci-test:latest
+
+test:
+	go test -v ./...
