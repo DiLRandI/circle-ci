@@ -10,7 +10,7 @@ jobs:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
     docker:
-      - image: circleci/golang:1.15.8
+      - image: circleci/golang:1.19
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
@@ -32,11 +32,30 @@ jobs:
             gotestsum --junitfile /tmp/test-reports/unit-tests.xml
       - store_test_results:
           path: /tmp/test-reports
+  
+  deploy:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/golang:1.19
+    steps:
+      - checkout
+      - run:
+          name: test deployment
+          command: |
+            echo "testing 123"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  sample: # This is the name of the workflow, feel free to change it to better match your workflow.
+  initial-build: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
+    when:
+      or:
+        - equal: [ main, << pipeline.git.branch >> ]
+        - equal: [ staging, << pipeline.git.branch >> ]
     jobs:
       - build
+  
+  wait-deploy:
+    jobs:
+      - deploy
