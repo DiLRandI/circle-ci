@@ -86,11 +86,11 @@ workflows:
   initial-build: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
     when:
+      and:
+        when: { equal: [ none, << pipeline.parameters.workflow >> ] }
       or:
         - equal: [ main, << pipeline.git.branch >> ]
         - equal: [ staging, << pipeline.git.branch >> ]
-      and:
-        when: { equal: [ none, << pipeline.parameters.workflow >> ] }
     jobs:
       - build
       - wait-deploy:
