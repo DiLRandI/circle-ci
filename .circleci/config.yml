@@ -107,7 +107,6 @@ workflows:
         - test-job
   
   prod-deployment:
-    deploy:
       when: { equal: [ prod, << pipeline.parameters.workflow >> ] }
       jobs:
         - deploy-job
