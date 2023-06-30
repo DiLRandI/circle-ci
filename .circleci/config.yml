@@ -89,6 +89,8 @@ workflows:
       or:
         - equal: [ main, << pipeline.git.branch >> ]
         - equal: [ staging, << pipeline.git.branch >> ]
+      and:
+        when: { equal: [ none, << pipeline.parameters.workflow >> ] }
     jobs:
       - build
       - wait-deploy:
@@ -99,13 +101,13 @@ workflows:
           requires:
             - wait-deploy
 
-staging-workflow:
-    when: { equal: [ staging, << pipeline.parameters.workflow >> ] }
-    jobs:
-      - test-job
-
-deploy-workflow:
-  deploy:
-    when: { equal: [ prod, << pipeline.parameters.workflow >> ] }
-    jobs:
-      - deploy-job
+  staging-deployment:
+      when: { equal: [ staging, << pipeline.parameters.workflow >> ] }
+      jobs:
+        - test-job
+  
+  prod-deployment:
+    deploy:
+      when: { equal: [ prod, << pipeline.parameters.workflow >> ] }
+      jobs:
+        - deploy-job
