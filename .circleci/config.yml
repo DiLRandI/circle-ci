@@ -7,6 +7,7 @@ version: 2.1
 parameters:
   workflow:
       type: enum
+      default: none
       description: The workflow to trigger.
       enum: [staging, prod]
 
@@ -98,13 +99,13 @@ workflows:
           requires:
             - wait-deploy
 
-  staging-workflow:
-      when: { equal: [ staging, << pipeline.parameters.workflow >> ] }
-      jobs:
-        - test-job
+staging-workflow:
+    when: { equal: [ staging, << pipeline.parameters.workflow >> ] }
+    jobs:
+      - test-job
 
-  deploy-workflow:
-    deploy:
-      when: { equal: [ prod, << pipeline.parameters.workflow >> ] }
-      jobs:
-        - deploy-job
+deploy-workflow:
+  deploy:
+    when: { equal: [ prod, << pipeline.parameters.workflow >> ] }
+    jobs:
+      - deploy-job
