@@ -9,7 +9,7 @@ parameters:
       type: enum
       default: none
       description: The workflow to trigger.
-      enum: [staging, prod]
+      enum: [none, staging, prod]
 
 jobs:
   build:
