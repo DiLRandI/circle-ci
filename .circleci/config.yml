@@ -87,7 +87,7 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     when:
       and:
-        when: { equal: [ none, << pipeline.parameters.workflow >> ] }
+        - equal: [ none, << pipeline.parameters.workflow >> ]
       or:
         - equal: [ main, << pipeline.git.branch >> ]
         - equal: [ staging, << pipeline.git.branch >> ]
