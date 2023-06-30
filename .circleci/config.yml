@@ -4,6 +4,14 @@ version: 2.1
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+parameters:
+  workflow:
+   new-workflow:
+      type: enum
+      default: test
+      description: The workflow to trigger.
+      enum: [test, deploy]
+
 jobs:
   build:
     working_directory: ~/repo
@@ -61,6 +69,17 @@ jobs:
             docker push $DOCKER_TAG:latest
             docker push $DOCKER_TAG:$NUM-$TAG
 
+  test-job:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - run: echo 'Testing...'
+
+  deploy-job:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - run: echo 'Deploying...'
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
@@ -80,3 +99,13 @@ workflows:
       - deploy:
           requires:
             - wait-deploy
+
+  new-workflow:
+    test:
+      when: { equal: [ test, << pipeline.parameters.workflow >> ] }
+      jobs:
+        - test-job
+    deploy:
+      when: { equal: [ deploy, << pipeline.parameters.workflow >> ] }
+      jobs:
+        - deploy-job
