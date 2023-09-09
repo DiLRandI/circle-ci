@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/DiLRandI/circle-ci/calc/intcalc"
 	"github.com/sirupsen/logrus"
+
+	_ "github.com/aws/aws-sdk-go/aws"
 )
 
 func main() {
