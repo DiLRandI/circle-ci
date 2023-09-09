@@ -26,11 +26,6 @@ jobs:
           keys:
             - go-mod-v4-{{ checksum "go.sum" }}
       - run:
-          name: Install Dependencies
-          command: go mod download
-      - store_test_results:
-          path: /tmp/test-reports
-      - run:
           name: build binary to bin
           command: make build
       - save_cache:
@@ -72,23 +67,21 @@ jobs:
       - restore_cache:
           keys:
             - go-mod-v4-{{ checksum "go.sum" }}
-      - run:
-          name: Install Dependencies
-          command: go mod download
-      - store_test_results:
-          path: /tmp/test-reports
+
       - run:
           name: Run test
           command: |
             go test ./... -coverprofile=c.out
             go tool cover -html=c.out -o coverage.html
             mv coverage.html /tmp/artifacts
+      - store_test_results:
+          path: /tmp/test-reports
+      - store_artifacts:
+          path: /tmp/artifacts
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "~/go/pkg/"
-      - store_artifacts:
-          path: /tmp/artifacts
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
