@@ -8,7 +8,10 @@ import (
 )
 
 func TestAdd(t *testing.T) {
+	t.Parallel()
+
 	sut := calc.New()
+
 	act := sut.Add(1, 1)
 
 	assert.Equal(t, 2, act)
