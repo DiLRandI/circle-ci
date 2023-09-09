@@ -1,5 +1,5 @@
 build:
-	CGO_ENABLED=0 go build -o bin/app cmd/app/main.go
+	CGO_ENABLED=0 go build -o bin/ci main.go
 
 build-image: build
 	docker build . -t deleema1/circle-ci-test:latest
