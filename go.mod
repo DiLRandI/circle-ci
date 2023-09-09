@@ -3,7 +3,6 @@ module github.com/DiLRandI/circle-ci
 go 1.21.0
 
 require (
-	github.com/aws/aws-sdk-go v1.45.6
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
 )
