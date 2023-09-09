@@ -14,7 +14,7 @@ func TestAdd(t *testing.T) {
 
 	act := sut.Add(1, 1)
 
-	assert.Equal(t, 2, act)
+	assert.Equal(t, 2.0, act)
 }
 
 func TestAddFloat(t *testing.T) {
