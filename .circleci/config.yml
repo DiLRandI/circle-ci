@@ -78,7 +78,7 @@ jobs:
       - store_test_results:
           path: /tmp/test-reports
       - run:
-          name: RUn test
+          name: Run test
           command: |
             go test ./... -coverprofile=c.out
             go tool cover -html=c.out -o coverage.html
