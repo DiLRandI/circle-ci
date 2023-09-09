@@ -36,7 +36,7 @@ jobs:
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
-            - "~/go/pkg/mod"
+            - "~/go/pkg/"
       - persist_to_workspace:
           root: .
           paths:
@@ -86,7 +86,7 @@ jobs:
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
-            - "~/go/pkg/mod"
+            - "~/go/pkg/"
       - store_artifacts:
           path: /tmp/artifacts
 
