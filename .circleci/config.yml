@@ -26,22 +26,12 @@ jobs:
           keys:
             - go-mod-v4-{{ checksum "go.sum" }}
       - run:
-          name: Install Dependencies
-          command: go mod download
+          name: build binary to bin
+          command: make build
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
-            - "/go/pkg/mod"
-      - run:
-          name: Run tests
-          command: |
-            mkdir -p /tmp/test-reports
-            gotestsum --junitfile /tmp/test-reports/unit-tests.xml
-      - store_test_results:
-          path: /tmp/test-reports
-      - run:
-          name: build binary to bin
-          command: make build
+            - "~/go/pkg/"
       - persist_to_workspace:
           root: .
           paths:
@@ -68,45 +58,69 @@ jobs:
             docker push $DOCKER_TAG:latest
             docker push $DOCKER_TAG:$NUM-$TAG
 
-  test-job:
+  test:
+    working_directory: ~/repo
     docker:
-      - image: cimg/base:2023.06
+      - image: cimg/go:1.21
     steps:
-      - run: echo 'Testing...'
-
-  deploy-job:
-    docker:
-      - image: cimg/base:2023.06
-    steps:
-      - run: echo 'Deploying...'
+      - checkout
+      - restore_cache:
+          keys:
+            - go-mod-v4-{{ checksum "go.sum" }}
+      - run:
+          name: Run test
+          command: |
+            gotestsum --junitfile unit-tests.xml -- -coverprofile=c.out ./...
+            go tool cover -html=c.out -o coverage.html
+            mv unit-tests.xml /tmp/test-reports
+            mv coverage.html /tmp/artifacts
+      - store_test_results:
+          path: /tmp/test-reports
+      - store_artifacts:
+          path: /tmp/artifacts
+      - save_cache:
+          key: go-mod-v4-{{ checksum "go.sum" }}
+          paths:
+            - "~/go/pkg/"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  initial-build: # This is the name of the workflow, feel free to change it to better match your workflow.
+  Build and Test: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
-    when:
-      and:
-        - equal: [ none, << pipeline.parameters.workflow >> ]
-        - or:
-            - equal: [ main, << pipeline.git.branch >> ]
-            - equal: [ staging, << pipeline.git.branch >> ]
+    when: {equal: [ none, << pipeline.parameters.workflow >> ]}
     jobs:
+      - test
       - build
-      - wait-deploy:
-          type: approval
-          requires: 
-          - build
-      - deploy:
-          requires:
-            - wait-deploy
 
-  staging-deployment:
+  Build Test and Deploy staging:
       when: { equal: [ staging, << pipeline.parameters.workflow >> ] }
       jobs:
-        - test-job
-  
-  prod-deployment:
-      when: { equal: [ prod, << pipeline.parameters.workflow >> ] }
+        - test
+        - build
+        - wait-deploy:
+            type: approval
+            requires: 
+            - test
+            - build
+        - deploy:
+            requires:
+              - wait-deploy
+
+  Build Test and Deploy Production:
+      when: 
+        or: 
+          - { equal: [ prod, << pipeline.parameters.workflow >> ] }
+          - equal: [ main, << pipeline.git.branch >> ]
+
       jobs:
-        - deploy-job
+        - test
+        - build
+        - wait-deploy:
+            type: approval
+            requires: 
+            - test
+            - build
+        - deploy:
+            requires:
+              - wait-deploy
