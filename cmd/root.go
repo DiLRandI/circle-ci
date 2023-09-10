@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/DiLRandI/circle-ci/internal/helper"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -17,24 +18,23 @@ var (
 	cfgFile string
 )
 
-// rootCmd represents the base command when called without any subcommands
+// rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:   "circle-ci",
 	Short: "A CLI to trigger Circle CI pipelines",
+	Run: func(cmd *cobra.Command, args []string) {
+		//nolint:errcheck
+		cmd.Help()
+	},
 }
 
 func Execute(ctx context.Context) {
-	logger, err := loggerFromContext(ctx)
+	logger, err := helper.LoggerFromContext(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	if err := rootCmd.MarkFlagRequired("circle-ci-api-key"); err != nil {
-		logger.Error("required flag is missing", "flag", "circle-ci-api-key", "error", err)
-		os.Exit(1)
-	}
-
-	ctx = context.WithValue(ctx, circleCiAPIKey, token)
+	ctx = context.WithValue(ctx, helper.ContextApiKey, token)
 
 	if err := rootCmd.ExecuteContext(ctx); err != nil {
 		logger.Error("execution error", "error", err)
@@ -46,9 +46,9 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.circle-ci.yaml)")
-	rootCmd.PersistentFlags().StringVarP(&token, "circle-ci-api-key", "t", "", fmt.Sprintf("Circle CI API key or [%s]", circleCiAPIKey))
+	rootCmd.PersistentFlags().StringVarP(&token, "api-key", "t", "", "Circle CI API key or [CIRCLE_CI_API_KEY]")
 
-	rootCmd.Flags().BoolP("toggle", "", false, "Help message for toggle")
+	rootCmd.AddCommand(meCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.

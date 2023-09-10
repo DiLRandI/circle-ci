@@ -9,12 +9,14 @@ import (
 	"os"
 
 	"github.com/DiLRandI/circle-ci/cmd"
+	"github.com/DiLRandI/circle-ci/internal/helper"
+	"github.com/lmittmann/tint"
 )
 
 func main() {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	logger := slog.New(tint.NewHandler(os.Stdout, nil))
 	ctx := context.Background()
-	ctx = context.WithValue(ctx, "ctx_logger", logger)
+	ctx = context.WithValue(ctx, helper.ContextLoggerKey, logger)
 
 	cmd.Execute(ctx)
 }
