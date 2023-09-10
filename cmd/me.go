@@ -19,7 +19,7 @@ var meCmd = &cobra.Command{
 			return err
 		}
 
-		logger.Info("Circle CI API", token)
+		logger.Info("Circle CI API", "token", token)
 		return nil
 	},
 }
