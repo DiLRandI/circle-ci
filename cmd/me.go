@@ -2,8 +2,10 @@ package cmd
 
 import (
 	"fmt"
+	"time"
 
-	"github.com/DiLRandI/circle-ci/internal/helper"
+	httpclient "github.com/DiLRandI/circle-ci/internal/httpClient"
+	"github.com/DiLRandI/circle-ci/internal/service/me"
 	"github.com/spf13/cobra"
 )
 
@@ -12,17 +14,13 @@ var meCmd = &cobra.Command{
 	Short: "Get information about the signed in user",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		logger, err := helper.LoggerFromContext(cmd.Context())
+		svc := me.New(httpclient.New(5 * time.Second))
+		data, err := svc.GetMe(cmd.Context())
 		if err != nil {
-			return fmt.Errorf("failed to get logger from context: %w", err)
+			return fmt.Errorf("failed to get me: %w", err)
 		}
 
-		token, err := helper.TokenFromContext(cmd.Context())
-		if err != nil {
-			return fmt.Errorf("failed to get token from context: %w", err)
-		}
-
-		logger.Info("Circle CI API", "token", token)
+		data.Print(cmd.OutOrStdout())
 
 		return nil
 	},

@@ -18,7 +18,7 @@ const (
 
 func TokenFromContext(ctx context.Context) (string, error) {
 	token, ok := ctx.Value(ContextApiKey).(*string)
-	if !ok || *token == "" {
+	if !ok || token == nil || *token == "" {
 		return "", cmderror.CircleCiAPIKeyNotFoundError
 	}
 

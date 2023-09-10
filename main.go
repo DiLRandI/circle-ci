@@ -1,6 +1,3 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package main
 
 import (
@@ -15,6 +12,8 @@ import (
 
 func main() {
 	logger := slog.New(tint.NewHandler(os.Stdout, nil))
+	logger = logger.With("app", "circle-ci")
+
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, helper.ContextLoggerKey, logger)
 
