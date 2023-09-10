@@ -1,3 +1,6 @@
+/*
+Copyright © 2023 NAME HERE <EMAIL ADDRESS>
+*/
 package cmd
 
 import (
@@ -6,10 +9,15 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
-var token string
+var (
+	token   string
+	cfgFile string
+)
 
+// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "circle-ci",
 	Short: "A CLI to trigger Circle CI pipelines",
@@ -35,6 +43,34 @@ func Execute(ctx context.Context) {
 }
 
 func init() {
+	cobra.OnInitialize(initConfig)
+
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.circle-ci.yaml)")
 	rootCmd.PersistentFlags().StringVarP(&token, "circle-ci-api-key", "t", "", fmt.Sprintf("Circle CI API key or [%s]", circleCiAPIKey))
-	rootCmd.AddCommand(meCmd)
+
+	rootCmd.Flags().BoolP("toggle", "", false, "Help message for toggle")
+}
+
+// initConfig reads in config file and ENV variables if set.
+func initConfig() {
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Find home directory.
+		home, err := os.UserHomeDir()
+		cobra.CheckErr(err)
+
+		// Search config in home directory with name ".circle-ci" (without extension).
+		viper.AddConfigPath(home)
+		viper.SetConfigType("yaml")
+		viper.SetConfigName(".circle-ci")
+	}
+
+	viper.AutomaticEnv() // read in environment variables that match
+
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	}
 }
