@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/DiLRandI/circle-ci/internal/helper"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -24,7 +25,7 @@ var rootCmd = &cobra.Command{
 }
 
 func Execute(ctx context.Context) {
-	logger, err := loggerFromContext(ctx)
+	logger, err := helper.LoggerFromContext(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -34,7 +35,7 @@ func Execute(ctx context.Context) {
 		os.Exit(1)
 	}
 
-	ctx = context.WithValue(ctx, circleCiAPIKey, token)
+	ctx = context.WithValue(ctx, helper.ContextApiKey, token)
 
 	if err := rootCmd.ExecuteContext(ctx); err != nil {
 		logger.Error("execution error", "error", err)
@@ -46,7 +47,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.circle-ci.yaml)")
-	rootCmd.PersistentFlags().StringVarP(&token, "circle-ci-api-key", "t", "", fmt.Sprintf("Circle CI API key or [%s]", circleCiAPIKey))
+	rootCmd.PersistentFlags().StringVarP(&token, "circle-ci-api-key", "t", "", "Circle CI API key or [CIRCLE_CI_API_KEY]")
 
 	rootCmd.Flags().BoolP("toggle", "", false, "Help message for toggle")
 }

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/DiLRandI/circle-ci/internal/helper"
 	"github.com/spf13/cobra"
 )
 
@@ -9,12 +10,12 @@ var meCmd = &cobra.Command{
 	Short: "Get information about the signed in user",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		logger, err := loggerFromContext(cmd.Context())
+		logger, err := helper.LoggerFromContext(cmd.Context())
 		if err != nil {
 			return err
 		}
 
-		token, err := tokenFromContext(cmd.Context())
+		token, err := helper.TokenFromContext(cmd.Context())
 		if err != nil {
 			return err
 		}
