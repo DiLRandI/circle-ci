@@ -1,10 +1,6 @@
 package cmd
 
 import (
-	"log"
-
-	"github.com/DiLRandI/circle-ci/internal/cmderror"
-
 	"github.com/spf13/cobra"
 )
 
@@ -13,13 +9,17 @@ var meCmd = &cobra.Command{
 	Short: "Get information about the signed in user",
 	Args:  cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		logger, ok := cmd.Context().Value(contextLoggerKey).(*log.Logger)
-		if !ok {
-			return cmderror.LoggerNotFoundError
+		logger, err := loggerFromContext(cmd.Context())
+		if err != nil {
+			return err
 		}
 
-		logger.Println("me called")
+		token, err := tokenFromContext(cmd.Context())
+		if err != nil {
+			return err
+		}
 
+		logger.Info("Circle CI API", token)
 		return nil
 	},
 }

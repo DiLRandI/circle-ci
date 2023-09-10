@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	var logger = slog.NewLogLogger(slog.NewTextHandler(os.Stdout, nil), slog.LevelInfo)
+	var logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
 	ctx := context.Background()
 	ctx = context.WithValue(ctx, "ctx_logger", logger)
 	cmd.Execute(ctx)
