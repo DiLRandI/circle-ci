@@ -88,7 +88,11 @@ jobs:
 workflows:
   Build and Test: # This is the name of the workflow, feel free to change it to better match your workflow.
     # Inside the workflow, you define the jobs you want to run.
-    when: {equal: [ none, << pipeline.parameters.workflow >> ]}
+    when: 
+      and:
+        - equal: [ none, << pipeline.parameters.workflow >> ]
+        - not:
+            equal: [ main, << pipeline.git.branch >> ]
     jobs:
       - test
       - build
@@ -110,7 +114,7 @@ workflows:
   Build Test and Deploy Production:
       when: 
         or: 
-          - { equal: [ prod, << pipeline.parameters.workflow >> ] }
+          - equal: [ prod, << pipeline.parameters.workflow >> ] 
           - equal: [ main, << pipeline.git.branch >> ]
 
       jobs:
